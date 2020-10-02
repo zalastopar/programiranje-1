@@ -219,7 +219,10 @@
     
     <div class="dropdown-buttons">
         <!-- ipynb file if we had a myst markdown file -->
-        
+        <a class="dropdown-buttons"
+            href="_sources/01-regularni-izrazi.ipynb"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Download notebook file" data-toggle="tooltip"
+                data-placement="left">.ipynb</button></a>
         <!-- Download raw file -->
         <a class="dropdown-buttons" href="_sources/01-regularni-izrazi.md"><button type="button"
                 class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
@@ -240,10 +243,73 @@
 
         <!-- Launch buttons -->
 
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
+        aria-label="Launch interactive content"><i class="fas fa-rocket"></i></button>
+    <div class="dropdown-buttons">
+        
+        <a class="binder-button" href="https://mybinder.org/v2/gh/matijapretnar/programiranje-1/zapiski?urlpath=tree/01-regularni-izrazi.md"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Launch Binder" data-toggle="tooltip"
+                data-placement="left"><img class="binder-button-logo"
+                    src="_static/images/logo_binder.svg"
+                    alt="Interact on binder">Binder</button></a>
+        
+        
+        
+        
+    </div>
+</div>
+
     </div>
 
     <!-- Table of contents -->
     <div class="d-none d-md-block col-md-2 bd-toc show">
+        
+        <div class="tocsection onthispage pt-5 pb-3">
+            <i class="fas fa-list"></i> Contents
+        </div>
+        <nav id="bd-toc-nav">
+            <ul class="nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#regularni-izrazi-v-pythonu">
+   Regularni izrazi v Pythonu
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#vzorci-za-znake">
+     Vzorci za znake
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#kvantifikatorji">
+     Kvantifikatorji
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#posebni-znaki">
+     Posebni znaki
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#skupine">
+     Skupine
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#metode-za-delo-z-regularnimi-izrazi">
+   Metode za delo z regularnimi izrazi
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#knjiznica-beautiful-soup">
+   Knjižnica Beautiful Soup
+  </a>
+ </li>
+</ul>
+
+        </nav>
         
     </div>
 </div>
@@ -254,6 +320,303 @@
                 
   <div class="section" id="regularni-izrazi">
 <h1>Regularni izrazi<a class="headerlink" href="#regularni-izrazi" title="Permalink to this headline">¶</a></h1>
+<p>Običajno moramo podatke, ki jih želimo analizirati, najprej prečistiti. Na primer, svetovni splet je bogat vir podatkov, vendar so ti dostikrat dostopni le v formatu HTML, ki poleg koristne vsebine vsebuje še marsikaj. Recimo, da nas zanimajo podatki o <a class="reference external" href="https://www.imdb.com/search/title/?sort=num_votes,desc&amp;title_type=feature&amp;count=250">250 filmih z največ glasovi na strani IMDB</a>. Vidimo, da stran ponuja veliko koristnih podatkov: naslov, leto izida, dolžno, žanre, ocene, igralce, opise, …</p>
+<p><img alt="250 najbolj znanih filmov" src="_images/250-najbolj-znanih-filmov.png" /></p>
+<p>Če pa v brskalniku shranimo izvorno kodo in HTML datoteko odpremo, pa je podatke težko najti.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;datoteke/250-najbolj-znanih-filmov.html&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">html</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">html</span><span class="p">[:</span><span class="mi">1000</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;!DOCTYPE html&gt;
+&lt;html
+    xmlns:og=&quot;http://ogp.me/ns#&quot;
+    xmlns:fb=&quot;http://www.facebook.com/2008/fbml&quot;&gt;
+    &lt;head&gt;
+        
+&lt;script type=&#39;text/javascript&#39;&gt;var ue_t0=ue_t0||+new Date();&lt;/script&gt;
+&lt;script type=&#39;text/javascript&#39;&gt;
+window.ue_ihb = (window.ue_ihb || window.ueinit || 0) + 1;
+if (window.ue_ihb === 1) {
+
+var ue_csm = window,
+    ue_hob = +new Date();
+(function(d){var e=d.ue=d.ue||{},f=Date.now||function(){return+new Date};e.d=function(b){return f()-(b?0:d.ue_t0)};e.stub=function(b,a){if(!b[a]){var c=[];b[a]=function(){c.push([c.slice.call(arguments),e.d(),d.ue_id])};b[a].replay=function(b){for(var a;a=c.shift();)b(a[0],a[1],a[2])};b[a].isStub=1}};e.exec=function(b,a){return function(){try{return b.apply(this,arguments)}catch(c){ueLogError(c,{attribution:a||&quot;undefined&quot;,logLevel:&quot;WARN&quot;})}}}})(ue_csm);
+
+
+    var ue_err_chan = &#39;jserr&#39;;
+(function(d,e){function h(f,b){if(!(a.ec&gt;a.mxe)&amp;&amp;f){a.ter.push(f);b=b||{};var c=f.logLevel||b.logLevel;c&amp;&amp;c!==k&amp;&amp;c!==m&amp;&amp;c!==n&amp;&amp;c!==p||a.ec++;c&amp;&amp;c
+</pre></div>
+</div>
+</div>
+</div>
+<p>Pomagajmo si s pomožno funkcijo, ki poišče začetke in konce vseh neprekrivajočih se pojavitev danega niza v besedilu.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">vse_pojavitve</span><span class="p">(</span><span class="n">besedilo</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">iskani_niz</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="n">konec_pojavitve</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">zacetek_pojavitve</span> <span class="o">=</span> <span class="n">besedilo</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">iskani_niz</span><span class="p">,</span> <span class="n">konec_pojavitve</span><span class="p">)</span>
+            <span class="n">konec_pojavitve</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">zacetek_pojavitve</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">iskani_niz</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">besedilo</span><span class="p">))</span>
+            <span class="k">yield</span> <span class="n">zacetek_pojavitve</span><span class="p">,</span> <span class="n">konec_pojavitve</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="k">break</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">list</span><span class="p">(</span><span class="n">vse_pojavitve</span><span class="p">(</span><span class="s1">&#39;Ena sama je, mama!&#39;</span><span class="p">,</span> <span class="s1">&#39;ma&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">  File</span><span class="nn"> &quot;&lt;ipython-input-3-9c7f628133ca&gt;&quot;</span><span class="gt">, line </span><span class="mi">1</span>
+    <span class="nb">list</span><span class="p">(</span><span class="n">vse_pojavitve</span><span class="p">(</span><span class="s1">&#39;Ena sama je, mama!&#39;</span><span class="p">,</span> <span class="s1">&#39;ma&#39;</span><span class="p">)</span>
+                                                  <span class="o">^</span>
+<span class="ne">SyntaxError</span>: unexpected EOF while parsing
+</pre></div>
+</div>
+</div>
+</div>
+<p>Če želimo, lahko vsako pojavitev prikažemo v njenem kontekstu:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">pokazi_vse_pojavitve</span><span class="p">(</span><span class="n">besedilo</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">iskani_niz</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">velikost_konteksta</span><span class="o">=</span><span class="mi">50</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">zacetek</span><span class="p">,</span> <span class="n">konec</span> <span class="ow">in</span> <span class="n">vse_pojavitve</span><span class="p">(</span><span class="n">besedilo</span><span class="p">,</span> <span class="n">iskani_niz</span><span class="p">):</span>
+        <span class="n">zacetek_konteksta</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">zacetek</span> <span class="o">-</span> <span class="n">velikost_konteksta</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">konec_konteksta</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">konec</span> <span class="o">+</span> <span class="n">velikost_konteksta</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">besedilo</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">besedilo</span><span class="p">[</span><span class="n">zacetek_konteksta</span><span class="p">:</span><span class="n">konec_konteksta</span><span class="p">])</span>
+        <span class="nb">print</span><span class="p">((</span><span class="n">zacetek</span> <span class="o">-</span> <span class="n">zacetek_konteksta</span><span class="p">)</span> <span class="o">*</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="p">(</span><span class="n">konec</span> <span class="o">-</span> <span class="n">zacetek</span><span class="p">)</span> <span class="o">*</span> <span class="s1">&#39;^&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pokazi_vse_pojavitve</span><span class="p">(</span><span class="s1">&#39;Ena sama je, mama!&#39;</span><span class="p">,</span> <span class="s1">&#39;ma&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Recimo, da nas zanimajo podatki o Vojni zvezd:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pokazi_vse_pojavitve</span><span class="p">(</span><span class="n">html</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">),</span> <span class="s1">&#39;Star Wars&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>V datoteki najdemo kar nekaj pojavitev, za vsako epizodo po dve: eno iz prikaza naslova in eno iz opisa slike. Vidimo, da so vsi naslovi podobne oblike: na začetku je značka <code class="docutils literal notranslate"><span class="pre">&lt;a</span> <span class="pre">href=&quot;/title/tt0123456/?ref_=adv_li_tt&quot;&gt;</span></code>, pri čemer se šifra spreminja od filma do filma, na koncu je <code class="docutils literal notranslate"><span class="pre">&lt;/a&gt;</span></code>, med njima pa je naslov filma. Če bi se zelo potrudili, bi lahko spisali program, ki iz takega niza izlušči šifro in naslov.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">izlusci_sifro_in_naslov</span><span class="p">(</span><span class="n">niz</span><span class="p">):</span>
+    <span class="n">pred_sifro</span> <span class="o">=</span> <span class="s1">&#39;&lt;a href=&quot;/title/tt&#39;</span>
+    <span class="n">med_sifro_in_naslovom</span> <span class="o">=</span> <span class="s1">&#39;/?ref_=adv_li_tt&quot;&gt;&#39;</span>
+    <span class="n">za_naslovom</span> <span class="o">=</span> <span class="s1">&#39;&lt;/a&gt;&#39;</span>
+    <span class="n">zacetek_sifre</span> <span class="o">=</span> <span class="n">niz</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">pred_sifro</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">pred_sifro</span><span class="p">)</span>
+    <span class="n">konec_sifre</span> <span class="o">=</span> <span class="n">niz</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">med_sifro_in_naslovom</span><span class="p">)</span>
+    <span class="n">zacetek_naslova</span> <span class="o">=</span> <span class="n">konec_sifre</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">med_sifro_in_naslovom</span><span class="p">)</span>
+    <span class="n">konec_naslova</span> <span class="o">=</span> <span class="n">niz</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">za_naslovom</span><span class="p">)</span>
+    <span class="n">sifra</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">niz</span><span class="p">[</span><span class="n">zacetek_sifre</span><span class="p">:</span><span class="n">konec_sifre</span><span class="p">])</span>
+    <span class="n">naslov</span> <span class="o">=</span> <span class="n">niz</span><span class="p">[</span><span class="n">zacetek_naslova</span><span class="p">:</span><span class="n">konec_naslova</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">sifra</span><span class="p">,</span> <span class="n">naslov</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">izlusci_sifro_in_naslov</span><span class="p">(</span><span class="s1">&#39;&lt;a href=&quot;/title/tt0076759/?ref_=adv_li_tt&quot;&gt;Star Wars: Episode IV - A New Hope&lt;/a&gt;&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">izlusci_sifro_in_naslov</span><span class="p">(</span><span class="s1">&#39;&lt;a href=&quot;/title/tt0086190/?ref_=adv_li_tt&quot;&gt;Star Wars: Episode VI - Return of the Jedi&lt;/a&gt;&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Podobno bi lahko naredili še za leto izida, dolžino in ostalo, vendar mora obstajati boljši način. Mi si bomo pogledali dva. Prvi način so regularni izrazi - ti so univerzalno (z manjšimi dialekti) razširjeni zapis vzorcev nizov, ki jih lahko uporabljamo za delo s kakršnim koli besedilom. Regularne izraze podpirajo praktično vsi programski jeziki in naprednejši urejevalniki besedil. Zaradi vseobče uporabnosti se bomo regularnim izrazom bolj posvetili, niso pa vedno najboljše orodje pri roki, saj zaradi splošnosti ne izkoristijo vse strukture, ki je na voljo. Zato si bomo ogledali še drugi način, knjižnico <a class="reference external" href="https://www.crummy.com/software/BeautifulSoup/">Beautiful Soup</a>, ki je namenjena analizi HTML datotek.</p>
+<div class="section" id="regularni-izrazi-v-pythonu">
+<h2>Regularni izrazi v Pythonu<a class="headerlink" href="#regularni-izrazi-v-pythonu" title="Permalink to this headline">¶</a></h2>
+<p>Za delo z regularnimi izrazi (ali regeksi) v Pythonu uporabljamo knjižnico <a class="reference external" href="https://docs.python.org/3/library/re.html"><code class="docutils literal notranslate"><span class="pre">re</span></code></a>, ki je vključen v vsako različico Pythona. V njej je najbolj osnovna funkcija <code class="docutils literal notranslate"><span class="pre">search</span></code>, ki sprejme vzorec in besedilo, v katerem iščemo, ter vrne prvo pojavitev, predstavljeno z objektom razreda <code class="docutils literal notranslate"><span class="pre">re.Match</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">re</span>
+<span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;ma&#39;</span><span class="p">,</span> <span class="s1">&#39;Ena sama je, mama!&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>V objektu imamo dostop do začetka in konca pojavitve in njene vsebine. Uporabimo lahko tudi funkcijo <code class="docutils literal notranslate"><span class="pre">re.finditer</span></code>, ki vrne iterator po vseh pojavitvah:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">list</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">finditer</span><span class="p">(</span><span class="s1">&#39;ma&#39;</span><span class="p">,</span> <span class="s1">&#39;Ena sama je, mama!&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>S pomočjo te funkcije lahko na veliko bolj enostaven način napišemo funkcijo <code class="docutils literal notranslate"><span class="pre">vse_pojavitve</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">vse_pojavitve</span><span class="p">(</span><span class="n">besedilo</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">vzorec</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">pojavitev</span> <span class="ow">in</span> <span class="n">re</span><span class="o">.</span><span class="n">finditer</span><span class="p">(</span><span class="n">vzorec</span><span class="p">,</span> <span class="n">besedilo</span><span class="p">):</span>
+        <span class="k">yield</span> <span class="n">pojavitev</span><span class="o">.</span><span class="n">start</span><span class="p">(),</span> <span class="n">pojavitev</span><span class="o">.</span><span class="n">end</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pokazi_vse_pojavitve</span><span class="p">(</span><span class="s1">&#39;Ena sama je, mama!&#39;</span><span class="p">,</span> <span class="s1">&#39;ma&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Seveda pa regularni izrazi pokažejo svojo pravo moč, ko začnemo uporabljati še ostale vzorce. Vse lahko najdete v <a class="reference external" href="https://docs.python.org/3/library/re.html#regular-expression-syntax">uradni dokumentaciji</a>, mi pa si poglejmo najbolj pogoste.</p>
+<div class="section" id="vzorci-za-znake">
+<h3>Vzorci za znake<a class="headerlink" href="#vzorci-za-znake" title="Permalink to this headline">¶</a></h3>
+<p>Katerikoli znak predstavimo s piko:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pokazi_vse_pojavitve</span><span class="p">(</span><span class="s1">&#39;Ena sama je, mama!&#39;</span><span class="p">,</span> <span class="s1">&#39;.a&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pokazi_vse_pojavitve</span><span class="p">(</span><span class="s1">&#39;Ena sama je, mama!&#39;</span><span class="p">,</span> <span class="s1">&#39;.m&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Če se želimo omejiti na posamezne znake ali posamezen razpon zaporednih znakov, jih naštejemo med oglatimi oklepaji:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pokazi_vse_pojavitve</span><span class="p">(</span><span class="s1">&#39;ata, mama, teta, stric&#39;</span><span class="p">,</span> <span class="s1">&#39;.[aeiou].&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pokazi_vse_pojavitve</span><span class="p">(</span><span class="s1">&#39;ata, mama, teta, stric&#39;</span><span class="p">,</span> <span class="s1">&#39;.[aeiou][a-z]&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Če kot prvi znak v oglatih oklepajih damo <code class="docutils literal notranslate"><span class="pre">^</span></code>, dobimo komplement:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pokazi_vse_pojavitve</span><span class="p">(</span><span class="s1">&#39;ata, mama, teta, stric&#39;</span><span class="p">,</span> <span class="s1">&#39;.[^aeiou].&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="kvantifikatorji">
+<h3>Kvantifikatorji<a class="headerlink" href="#kvantifikatorji" title="Permalink to this headline">¶</a></h3>
+<p>Z <code class="docutils literal notranslate"><span class="pre">*</span></code> označimo poljubno mnogo ponovitev danega vzorca:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pokazi_vse_pojavitve</span><span class="p">(</span><span class="s1">&#39;Oddal sem davčno napoved&#39;</span><span class="p">,</span> <span class="s1">&#39;d*a&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Če želimo, da se vzorec pojavi vsaj enkrat, uporabimo <code class="docutils literal notranslate"><span class="pre">+</span></code>:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pokazi_vse_pojavitve</span><span class="p">(</span><span class="s1">&#39;Oddal sem davčno napoved&#39;</span><span class="p">,</span> <span class="s1">&#39;d+a&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Kvantifikatorja <code class="docutils literal notranslate"><span class="pre">*</span></code> in <code class="docutils literal notranslate"><span class="pre">+</span></code> sta požrešna, kar pomeni, da poskusita zajeti kolikor znakov lahko:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pokazi_vse_pojavitve</span><span class="p">(</span><span class="s1">&#39;Oddal sem davčno napoved&#39;</span><span class="p">,</span> <span class="s1">&#39;d.*a&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pokazi_vse_pojavitve</span><span class="p">(</span><span class="s1">&#39;Oddal sem davčno napoved&#39;</span><span class="p">,</span> <span class="s1">&#39;d.+a&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Če želimo najti najkrajše možne pojavitve, moramo na koncu dodati še <code class="docutils literal notranslate"><span class="pre">?</span></code>:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pokazi_vse_pojavitve</span><span class="p">(</span><span class="s1">&#39;Oddal sem davčno napoved&#39;</span><span class="p">,</span> <span class="s1">&#39;d.*?a&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pokazi_vse_pojavitve</span><span class="p">(</span><span class="s1">&#39;Oddal sem davčno napoved&#39;</span><span class="p">,</span> <span class="s1">&#39;d.+?a&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Če uporabimo samo <code class="docutils literal notranslate"><span class="pre">?</span></code>, to pomeni morebitno pojavitev vzorca:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pokazi_vse_pojavitve</span><span class="p">(</span><span class="s1">&#39;Oddal sem davčno napoved&#39;</span><span class="p">,</span> <span class="s1">&#39;da?&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Kvantifikatorji <code class="docutils literal notranslate"><span class="pre">*</span></code>, <code class="docutils literal notranslate"><span class="pre">+</span></code> in <code class="docutils literal notranslate"><span class="pre">?</span></code> so posebni primeri kvantifikatorja <code class="docutils literal notranslate"><span class="pre">{m,n}</span></code>, ki predstavlja katerokoli število ponovitev med <code class="docutils literal notranslate"><span class="pre">m</span></code> in <code class="docutils literal notranslate"><span class="pre">n</span></code>, pri čemer lahko kakšno izmed meja tudi izpustimo. Tako je kvantifikator <code class="docutils literal notranslate"><span class="pre">*</span></code> okrajšava za <code class="docutils literal notranslate"><span class="pre">{0,}</span></code>, kvantifikator <code class="docutils literal notranslate"><span class="pre">+</span></code> okrajšava za <code class="docutils literal notranslate"><span class="pre">{1,}</span></code>, kvantifikator <code class="docutils literal notranslate"><span class="pre">?</span></code> pa okrajšava za <code class="docutils literal notranslate"><span class="pre">{0,1}</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pokazi_vse_pojavitve</span><span class="p">(</span><span class="s1">&#39;&quot;Brrrr, brrrrrr, brrr, brrrrrrr,&quot; je drgetal od mraza.&#39;</span><span class="p">,</span> <span class="s1">&#39;[Bb]r{4,5}&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pokazi_vse_pojavitve</span><span class="p">(</span><span class="s1">&#39;&quot;Brrr, brrrrrr, brrr, brrrrrrr,&quot; je drgetal od mraza.&#39;</span><span class="p">,</span> <span class="s1">&#39;[Bb]r{4,}&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pokazi_vse_pojavitve</span><span class="p">(</span><span class="s1">&#39;&quot;Brrr, brrrrrr, brrr, brrrrrrr,&quot; je drgetal od mraza.&#39;</span><span class="p">,</span> <span class="s1">&#39;[Bb]r{,5}&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="posebni-znaki">
+<h3>Posebni znaki<a class="headerlink" href="#posebni-znaki" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="skupine">
+<h3>Skupine<a class="headerlink" href="#skupine" title="Permalink to this headline">¶</a></h3>
+</div>
+</div>
+<div class="section" id="metode-za-delo-z-regularnimi-izrazi">
+<h2>Metode za delo z regularnimi izrazi<a class="headerlink" href="#metode-za-delo-z-regularnimi-izrazi" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="knjiznica-beautiful-soup">
+<h2>Knjižnica Beautiful Soup<a class="headerlink" href="#knjiznica-beautiful-soup" title="Permalink to this headline">¶</a></h2>
+</div>
 </div>
 
     <script type="text/x-thebe-config">

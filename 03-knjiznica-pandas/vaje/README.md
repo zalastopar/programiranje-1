@@ -26,3 +26,6 @@ zavihek vašega spletnega brskalnika.
   * Dodajte celice kjer izvršujete kodo za pridobivanje in obdelavo podatkov in jih dokumentirajte.
 
 * Sledite navodilom v [vaje za pandas](pandas_101.ipynb) kjer uporabljate profesorjevo bazo filmov.
+
+
+če želiš delat na netu v terminal vpišeš: jupyter notebook

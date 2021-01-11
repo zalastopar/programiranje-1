@@ -12,7 +12,6 @@
  Nato napišite funkciji [euro_to_dollar] in [dollar_to_euro], ki primerno
  pretvarjata valuti (točne vrednosti pridobite na internetu ali pa si jih
  izmislite).
-
  Namig: Občudujte informativnost tipov funkcij.
  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  # dollar_to_euro;;
@@ -20,104 +19,81 @@
  # dollar_to_euro (Dollar 0.5);;
  - : euro = Euro 0.4305
 [*----------------------------------------------------------------------------*)
-
 type euro = Euro of float
 type dollar = Dollar of float
 
-let en_euro = Euro 1.0 (* Evro(1.0)*)
+let dollar_to_euro (Dollar x) = Euro (x *. 0.861)
+let euro_to_dollar (Euro x) = Dollar (x *. 1.161)
 
-let dollar_to_euro dollar = match dollar with
-       | Dollar d -> Euro(d *. 0.84)
-
-(*
-let dollar_to_euro (Dollar d) = Euro (d *. 0.84)
-če mamo samo eno možnost, kaj dobimo*)
-
-let razmerje = 0.84
-
-let euro_to_dollar (Euro e) = Dollar (e /. razmerje)
 
 (*----------------------------------------------------------------------------*]
  Definirajte tip [currency] kot en vsotni tip z konstruktorji za jen, funt
  in švedsko krono. Nato napišite funkcijo [to_pound], ki primerno pretvori
  valuto tipa [currency] v funte.
-
  Namig: V tip dodajte še švicarske franke in se navdušite nad dejstvom, da vas
         Ocaml sam opozori, da je potrebno popraviti funkcijo [to_pound].
  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  # to_pound (Yen 100.);;
  - : currency = Pound 0.007
 [*----------------------------------------------------------------------------*)
-type currency = 
-       | Yen of float
-       | Pound of float
-       | Krona of float
-       | Chf of float
+type currency = Yen of float | Pound of float | Krona of float
 
-let to_pound c = match c with
-       | Pound x -> Pound x
-       | Yen x -> Pound (x *. 0.007)
-       | Krona x -> Pound (x *. 0.09)
-       | Chf x -> Pound (x *. 2.0)
+let to_pound = function
+  | Pound x -> Pound x
+  | Yen x -> Pound (0.007 *. x)
+  | Krona x -> Pound (0.085 *. x)
+       
+
 
 (*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*]
  Želimo uporabljati sezname, ki hranijo tako cela števila kot tudi logične
  vrednosti. To bi lahko rešili tako da uvedemo nov tip, ki predstavlja celo
  število ali logično vrednost, v nadaljevanju pa bomo raje konstruirali nov tip
  seznamov.
-
  Spomnimo se, da lahko tip [list] predstavimo s konstruktorjem za prazen seznam
  [Nil] (oz. [] v Ocamlu) in pa konstruktorjem za člen [Cons(x, xs)] (oz.
  x :: xs v Ocamlu).
 [*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*)
-
 
 (*----------------------------------------------------------------------------*]
  Definirajte tip [intbool_list] z konstruktorji za:
   1.) prazen seznam,
   2.) člen z celoštevilsko vrednostjo,
   3.) člen z logično vrednostjo.
-
  Nato napišite testni primer, ki bi predstavljal "[5; true; false; 7]".
 [*----------------------------------------------------------------------------*)
-(*Tako se naredi seznam *)
-type list = 
-       | Node of int * list
-       | Empty
+type intbool_list = 
+       | Nil
+       | Stevilo of int * intbool_list
+       | Logika of bool * intbool_list
 
-type intbool_list =
-       | Empty
-       | Int of int * intbool_list
-       | Bool of bool * intbool_list
+let test = Stevilo (5,  Logika (true,  Logika (false,  Stevilo (7, Nil))))
 
-let testni = Int(5, 
-              Bool(true, 
-              Bool(false, 
-              Int(7, 
-              Empty))))
+
 (*----------------------------------------------------------------------------*]
  Funkcija [intbool_map f_int f_bool ib_list] preslika vrednosti [ib_list] v nov
  [intbool_list] seznam, kjer na elementih uporabi primerno od funkcij [f_int]
  oz. [f_bool].
 [*----------------------------------------------------------------------------*)
 
-let rec intbool_map f_int f_bool ib_list = match ib_list with
-       | Empty -> Empty
-       | Int (x, rep) ->Int(f_int x, intbool_map f_int f_bool rep)
-       | Bool (x, rep) -> Bool(f_bool x, intbool_map f_int f_bool rep)
+let rec intbool_map f_int f_bool = function
+       | Stevilo (x, xs) -> Stevilo (f_int x, intbool_map f_int f_bool xs)
+       | Logika (x, xs) -> Logika (f_bool x, intbool_map f_int f_bool xs)
+       | Nil -> Nil
+       
 
 (*----------------------------------------------------------------------------*]
  Funkcija [intbool_reverse] obrne vrstni red elementov [intbool_list] seznama.
  Funkcija je repno rekurzivna.
 [*----------------------------------------------------------------------------*)
 
-let rec intbool_reverse l =
-       let rec reverse_pomozna gradimo podiramo = match podiramo with
-              | Empty -> gradimo
-              | Int(x, rep) -> reverse_pomozna (Int(x, gradimo)) rep
-              | Bool(x, rep) -> reverse_pomozna (Bool(x, gradimo)) rep
+let rec intbool_reverse sez = 
+       let rec pomozna acc sez = match sez with
+       | Stevilo (x, xs) -> pomozna (Stevilo (x, acc)) xs
+       | Logika (x, xs) -> pomozna (Logika (x, acc)) xs
+       | Nil -> acc
        in
-       reverse_pomozna Empty l
+       pomozna Nil sez
 
 (*----------------------------------------------------------------------------*]
  Funkcija [intbool_separate ib_list] loči vrednosti [ib_list] v par [list]
@@ -125,13 +101,13 @@ let rec intbool_reverse l =
  vrednosti. Funkcija je repno rekurzivna in ohranja vrstni red elementov.
 [*----------------------------------------------------------------------------*)
 
-let rec intbool_separate l = 
-       let rec separate_pomozna inti booli l = match l with
-              | Empty -> (inti, booli)
-              | Int(x, rep) -> separate_pomozna (inti @ [x]) booli rep
-              | Bool(x, rep) -> separate_pomozna inti (booli @ [x]) rep
+let rec intbool_separate sez = 
+       let rec pomozna st bo sez = match sez with 
+              | Stevilo (x, xs) -> pomozna (st @ [x]) bo xs
+              | Logika (x, xs) -> pomozna st (bo @ [x]) xs
+              | Nil -> (st, bo)
        in 
-       separate_pomozna [] [] l
+       pomozna [] [] sez
 
 (*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*]
  Določeni ste bili za vzdrževalca baze podatkov za svetovno priznano čarodejsko
@@ -139,27 +115,23 @@ let rec intbool_separate l =
  pregledno hranjenje podatkov.
 [*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*)
 
-
 (*----------------------------------------------------------------------------*]
  Čarodeje razvrščamo glede na vrsto magije, ki se ji posvečajo. Definirajte tip
  [magic], ki loči med magijo ognja, magijo ledu in magijo arkane oz. fire,
  frost in arcane.
-
  Ko se čarodej zaposli na akademiji, se usmeri v zgodovino, poučevanje ali
  raziskovanje oz. historian, teacher in researcher. Definirajte tip
  [specialisation], ki loči med temi zaposlitvami.
 [*----------------------------------------------------------------------------*)
-type magic = 
-       | Fire 
-       | Frost 
+type magic =
+       | Fire
+       | Frost
        | Arcane
 
 type specialisation = 
-       | Historian 
-       | Teacher 
+       | Historian
+       | Teacher
        | Researcher
-
-
 
 
 (*----------------------------------------------------------------------------*]
@@ -169,7 +141,6 @@ type specialisation =
   a.) začetnik [Newbie],
   b.) študent [Student] (in kateri vrsti magije pripada in koliko časa študira),
   c.) zaposlen [Employed] (in vrsto magije in specializacijo).
-
  Nato definirajte zapisni tip [wizard] z poljem za ime in poljem za trenuten
  status.
  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -177,15 +148,14 @@ type specialisation =
  - : wizard = {name = "Matija"; status = Employed (Fire, Teacher)}
 [*----------------------------------------------------------------------------*)
 
-type status = 
-       | Newbie 
-       | Student of (magic * float) 
-       | Employed of (magic * specialisation)
+type status =
+       | Newbie
+       | Student of magic * int
+       | Employed of magic * specialisation
 
 type wizard = {name: string; status: status}
 
-let profesor = {name = "Matija", status = Employed (Fire, Teacher)}
-
+let professor = {name = "Matija"; status = Employed (Fire, Teacher)}
 
 (*----------------------------------------------------------------------------*]
  Želimo prešteti koliko uporabnikov posamezne od vrst magije imamo na akademiji.
@@ -199,12 +169,11 @@ let profesor = {name = "Matija", status = Employed (Fire, Teacher)}
 [*----------------------------------------------------------------------------*)
 type magic_counter = {fire: int; frost: int; arcane: int}
 
-let update ({arcane = vrednost_arcane} as magic_counter) magic_type = match magic_type with
-       | Fire -> {fire = magic_counter.fire + 1; 
-                     frost = magic_counter.frost;
-                      arcane = magic_counet.arcane}
-       | Frost -> {magic_counter with frost = magic_counter.frost + 1}
-       | Arcane -> {magic_counter with arcane = vrednost_arcane + 1} (* ce si prej odpakiramo*)
+let rec update counter magic = match magic with
+       | Fire -> {fire = counter.fire + 1; frost = counter.frost; arcane = counter.arcane}
+       | Frost -> {fire = counter.fire; frost = counter.frost + 1; arcane = counter.arcane}
+       | Arcane -> {counter with arcane = counter.arcane + 1}
+
 
 (*----------------------------------------------------------------------------*]
  Funkcija [count_magic] sprejme seznam čarodejev in vrne števec uporabnikov
@@ -214,19 +183,17 @@ let update ({arcane = vrednost_arcane} as magic_counter) magic_type = match magi
  - : magic_counter = {fire = 3; frost = 0; arcane = 0}
 [*----------------------------------------------------------------------------*)
 
-let rec count_magic l = 
-       let count_pomozna trenutno delovni = match delovni with
-              | [] -> trenutno
-              | x::rest -> 
-                     let trenutni' = match x.status with
-                            | Newbie -> trenutno
-                            | Student (magic, _) -> update trenutno magic
-                            | Employed (magic, _) -> update trenutno magic
-                     in 
-                     count_pomozna trenutni' rest
-
-       in count_pomozna {fire = 0; frost = 0; arcane = 0} l
-
+let rec count_magic sez = 
+       let rec pomozna counter sez = match sez with
+              | [] -> counter
+              | {name; status} :: ostali -> (
+                     match status with
+                            | Newbie -> pomozna counter ostali
+                            | Student (a, b) -> pomozna (update counter a) ostali
+                            | Employed (a, b) -> pomozna (update counter a) ostali
+              )
+       in 
+       pomozna {fire = 0; frost = 0; arcane = 0}
 (*----------------------------------------------------------------------------*]
  Želimo poiskati primernega kandidata za delovni razpis. Študent lahko postane
  zgodovinar po vsaj treh letih študija, raziskovalec po vsaj štirih letih
@@ -240,20 +207,33 @@ let rec count_magic l =
  # find_candidate Frost Researcher [professor; jaina];;
  - : string option = Some "Jaina"
 [*----------------------------------------------------------------------------*)
-let zahtevana_leta = function
+
+let solanje = function
        | Historian -> 3
        | Researcher -> 4
        | Teacher -> 5
 
-let rec find_candidate magic specialization wizard_list = match wizard_list with
+let rec find_candidate magic specialisation carovniki = match carovniki with
        | [] -> None
-       | wizard :: rest -> (
-              match wizard.status with
-              | Student (magic, years) -> assert false
-              | Student (student_magic, years) when student_magic = magic ->(
-                     if (zahtevana_leta specialization) <= years then 
-                            Some wizard.name
-                     else (find_candidate magic specializatin rest)
-              )
-              | _ -> find_candidate magic specialization rest
+       | {name; status} :: ostali -> (
+              match status with
+                     | Newbie -> find_candidate magic specialisation ostali
+                     | Student (m, st) -> if m = magic && st >= (solanje specialisation) then Some name else find_candidate magic specialisation ostali
+                     | Employed (a, b) -> find_candidate magic specialisation ostali
        )
+
+let find_candidate' magic specialisation wizard_list =
+       let year =
+              match specialisation with
+              | Historian -> 3
+              | Researcher -> 4
+              | Teacher -> 5
+       in
+       let rec search = function
+              | [] -> None
+              | {name; status} :: wizards ->
+              match status with
+              | Student (m, y) when m = magic && y >= year -> Some name
+              | _ -> search wizards
+       in
+       search wizard_list

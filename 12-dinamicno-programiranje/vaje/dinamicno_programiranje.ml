@@ -21,6 +21,17 @@ let test_matrix =
      [| 2 ; 4 ; 5 |];
      [| 7 ; 0 ; 1 |] |]
 
+let max_cheese matrika =
+   let h = (Array.length matrika - 1) in
+   let w = (Array.length matrika.(0) - 1) in
+   let rec pot i j matrika vsota = 
+      if i = h && j < w then pot i (j+1) matrika (vsota + matrika.(i).(j+1))
+      else if i < h && j = w then pot (i + 1) j matrika (vsota + matrika.(i+1).(j))
+      else if i = h && j = w then vsota
+      else max (pot i (j+1) matrika (vsota + matrika.(i).(j+1))) (pot (i+1) j matrika (vsota + matrika.(i+1).(j))) 
+   in pot 0 0 matrika matrika.(0).(0)
+
+
 (*----------------------------------------------------------------------------*]
  Poleg količine sira, ki jo miška lahko poje, jo zanima tudi točna pot, ki naj
  jo ubere, da bo prišla do ustrezne pojedine.
@@ -37,6 +48,16 @@ let test_matrix =
 [*----------------------------------------------------------------------------*)
 
 type mouse_direction = Down | Right
+
+let rec optimal_path matrika = 
+      let h = (Array.length matrika - 1) in
+      let w = (Array.length matrika.(0) - 1) in 
+      let rec pot i j matrika vsota optimum = 
+         if i = h && j < w then pot i (j+1) matrika (vsota + matrika.(i).(j+1)) (optimum @ [Right])
+         else if i < h && j = w then pot (i + 1) j matrika (vsota + matrika.(i+1).(j)) (optimum @ [Down])
+         else if i = h && j = w then (vsota, optimum)
+         else max (fst (pot i (j+1) matrika (vsota + matrika.(i).(j+1)) (optimum @ [Right]))) (fst (pot (i+1) j matrika (vsota + matrika.(i+1).(j)) (optimum @ [Down])))
+      in pot 0 0 matrika matrika.(0).(0) []
 
 
 (*----------------------------------------------------------------------------*]
